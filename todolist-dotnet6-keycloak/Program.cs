@@ -1,3 +1,9 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
+using System.Reflection.Metadata;
+using todolist_dotnet6_keycloak.Models;
+
 internal class Program
 {
     private static void Main(string[] args)
@@ -7,9 +13,11 @@ internal class Program
         // Add services to the container.
         builder.Services.AddRazorPages();
         builder.Services.AddSwaggerGen();
+        builder.Services.AddEntityFrameworkSqlServer()
+            .AddDbContext<TodolistContext>(options =>
+            options.UseSqlServer(builder.Configuration.GetConnectionString("todolist_dotnet6_keycloakContext")));
 
         var app = builder.Build();
-        Console.WriteLine("Running App");
 
         // Configure the HTTP request pipeline.
         if (!app.Environment.IsDevelopment())
@@ -28,11 +36,18 @@ internal class Program
         app.UseStaticFiles();
 
         app.UseRouting();
-
         app.UseAuthorization();
         app.MapControllers();
         app.MapRazorPages();
 
         app.Run();
     }
+}
+public class TodolistContext : DbContext
+{
+    public DbSet<UserModel> UserModels { get; set; }
+    public TodolistContext(DbContextOptions options) : base(options)
+    {
+    }
+
 }
